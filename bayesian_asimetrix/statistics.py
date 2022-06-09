@@ -43,7 +43,7 @@ def max_post_estimate(df_post: pd.core.frame.DataFrame) -> pd.core.series.Series
     """
     Estimates the value that Maximizes the Posteriori Joint Probability Density Function (MAP)
     Args:
-        df_post: Distribución a posteriori conjunta restultado de la simulación
+        df_post: A posteriori joint distribution of the model parameters
     Returns:
         MAP
     """
