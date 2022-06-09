@@ -6,10 +6,11 @@ Author: Ruben D. Vargas
 
 # Python Packages
 import numpy as np
+import pandas as pd
 from scipy import stats
 import pymc3 as pm
 
-def mode_estimate(arr: np.array) -> float:
+def mode_estimate(arr: np.ndarray) -> float:
     """
     Estimates the mode of a numeric 1D-array.
     The mode of a numeric a numerica array is the point that maximizes the probability density function
@@ -25,8 +26,7 @@ def mode_estimate(arr: np.array) -> float:
 
     return mode
 
-
-def high_density_interval(arr: np.array, alpha: float=0.05) -> np.array:
+def high_density_interval(arr: np.ndarray, alpha: float=0.05) -> np.ndarray:
     """
     Estimates the High Density Inteval from a numeric 1D-array.
     The high density interval are the values which are most credible and cover (1-alpha) of the whole distribution
@@ -36,4 +36,23 @@ def high_density_interval(arr: np.array, alpha: float=0.05) -> np.array:
     Returns:
         High Density Interval
     """
+
     return pm.hdi(arr, alpha)
+
+def max_post_estimate(df_post: pd.core.frame.DataFrame) -> pd.core.series.Series:
+    """
+    Estimates the value that Maximizes the Posteriori Joint Probability Density Function (MAP)
+    Args:
+        df_post: Distribución a posteriori conjunta restultado de la simulación
+    Returns:
+        MAP
+    """
+
+    dp_post = df_post.copy()
+    params = dp_post.columns
+    kde = stats.gaussian_kde(dp_post.values.T)
+    dp_post['pdf'] = kde.pdf(dp_post.values.T)
+    map_theta = dp_post[dp_post.pdf == dp_post.pdf.max()].iloc[0][params]
+    map_theta.name = 'MAP'
+
+    return map_theta
