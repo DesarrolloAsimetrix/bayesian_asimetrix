@@ -32,7 +32,7 @@ def high_density_interval(arr: np.ndarray, alpha: float=0.05) -> np.ndarray:
     The high density interval are the values which are most credible and cover (1-alpha) of the whole distribution
     Args:
         arr : 1-D array, the data
-        alpha: significance
+        alpha: significance. A number between 0 and 1.
     Returns:
         High Density Interval
     """
