@@ -79,7 +79,7 @@ def plot_feat_post(df_post: pd.DataFrame, feat: str, alpha: float=0.05, rope: li
     return fig
 
 
-def hitrogram_grid_plot(df_post: pd.DataFrame) -> go.Figure:
+def histrogram_grid_plot(df_post: pd.DataFrame) -> go.Figure:
     """
     Plots the complete posteriori for all of the features in the dataframe
     The poteriori distribution of a parameter contains all sort of usefull information to diagnose
