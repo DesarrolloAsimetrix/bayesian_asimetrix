@@ -108,9 +108,8 @@ def hitrogram_grid_plot(df_post: pd.DataFrame) -> go.Figure:
       hist = go.Histogram(x=hist_data, name=hist_data.name, marker_color='gray')
       fig.add_trace(hist, row, col)
       
-      # yaxis0 doesn't exist, just yaxis in that case
-      fig.layout['yaxis'+str(i if i != 0 else '')].update(showticklabels=False) # Erase the yaxis ticks
-      fig.layout['xaxis'+str(i if i != 0 else '')].update(title=hist_data.name) # Put a name on the x axis
+      fig.layout['yaxis'+str(i+1)].update(showticklabels=False) # Erase the yaxis ticks
+      fig.layout['xaxis'+str(i+1)].update(title=hist_data.name) # Put a name on the x axis
 
       # Just to keep filling the the grid on the next row once the current row has been filled
       if col < 4:
@@ -122,8 +121,6 @@ def hitrogram_grid_plot(df_post: pd.DataFrame) -> go.Figure:
     fig.layout.update(
         title=dict(text='Distribución a Posteriori de los Parametros', font_size=25),
         template='plotly_white', bargap=0.1, showlegend=False,
-        # I still don't know why but I needed to erase one more more yaxis
-        yaxis15=dict(showticklabels=False)
     )
 
     return fig
