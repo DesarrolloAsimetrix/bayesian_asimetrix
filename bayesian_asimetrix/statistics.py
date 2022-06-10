@@ -56,3 +56,17 @@ def max_post_estimate(df_post: pd.DataFrame) -> pd.Series:
     map_theta.name = 'MAP'
 
     return map_theta
+
+def prob_density_estimate(df_post: pd.DataFrame) -> np.ndarray:
+    """
+    Estimate the Probability Density Function from the posteriori simulation output
+    Args:
+        df_post: A posteriori joint distribution of the model parameters
+    Returns:
+        Probability densities corresponding to each combination of posteriori parameters
+    """
+
+    kde = stats.gaussian_kde(df_post.values.T)
+    dens = kde.pdf(df_post.values.T)
+
+    return dens

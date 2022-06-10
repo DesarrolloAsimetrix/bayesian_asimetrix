@@ -124,3 +124,34 @@ def histrogram_grid_plot(df_post: pd.DataFrame) -> go.Figure:
     )
 
     return fig
+
+
+def parallel_density_plot(df_post: pd.DataFrame) -> go.Figure:
+    """
+    Plots the probability density function in a parallel coorinates plot
+    Args:
+        df_post: A posteriori joint distribution of the model parameters
+    Returns:
+       Figure of the parallel coordinates plot with the densities as the opacities of the lines
+    """
+
+    # Density Estimation
+    densities = statistics.prob_density_estimate(df_post)
+
+    # Figure Set Up
+    fig = go.Figure(
+        data = go.Parcoords(
+            line = dict(
+                # Set Line Color According to Densities
+                color=densities,
+                showscale=False, colorscale='reds', reversescale=False
+            ), 
+            dimensions = [dict(label=feat, values=df_post[feat]) for feat in df_post.columns]
+        ),
+        layout = go.Layout(
+            title=dict(text='Probability Density Plot', font_size=25)
+        )
+    )
+
+    # Return
+    return fig
