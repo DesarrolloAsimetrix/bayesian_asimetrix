@@ -37,9 +37,9 @@ def high_density_interval(arr: np.ndarray, alpha: float=0.05) -> np.ndarray:
         High Density Interval
     """
 
-    return pm.hdi(arr, alpha)
+    return pm.hdi(arr, alpha=alpha)
 
-def max_post_estimate(df_post: pd.core.frame.DataFrame) -> pd.core.series.Series:
+def max_post_estimate(df_post: pd.DataFrame) -> pd.Series:
     """
     Estimates the value that Maximizes the Posteriori Joint Probability Density Function (MAP)
     Args:

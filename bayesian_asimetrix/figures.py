@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from bayesian_asimetrix import statistics
 
-def plot_feat_post(df_post: pd.core.frame.DataFrame, feat: str, alpha: float=0.05, rope: list=()):
+def plot_feat_post(df_post: pd.DataFrame, feat: str, alpha: float=0.05, rope: list=()):
     """
     Plots the posteriori of a single feature
     The poteriori distribution of a parameter contains all sort of usefull information to diagnose
