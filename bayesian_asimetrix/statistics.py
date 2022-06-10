@@ -48,11 +48,9 @@ def max_post_estimate(df_post: pd.DataFrame) -> pd.Series:
         MAP
     """
 
-    dp_post = df_post.copy()
-    params = dp_post.columns
-    kde = stats.gaussian_kde(dp_post.values.T)
-    dp_post['pdf'] = kde.pdf(dp_post.values.T)
-    map_theta = dp_post[dp_post.pdf == dp_post.pdf.max()].iloc[0][params]
+    dp_post = df_post.reset_index(drop=True)
+    pdfs = prob_density_estimate(dp_post)
+    map_theta = dp_post.loc[np.where(pdfs == pdfs.max())]
     map_theta.name = 'MAP'
 
     return map_theta
