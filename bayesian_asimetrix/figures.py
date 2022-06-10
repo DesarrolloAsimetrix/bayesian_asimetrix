@@ -6,11 +6,12 @@ Author: Ruben D. Vargas
 
 # Python Packages
 import pandas as pd
+import math
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from bayesian_asimetrix import statistics
 
-def plot_feat_post(df_post: pd.DataFrame, feat: str, alpha: float=0.05, rope: list=()):
+def plot_feat_post(df_post: pd.DataFrame, feat: str, alpha: float=0.05, rope: list=()) -> go.Figure:
     """
     Plots the posteriori of a single feature
     The poteriori distribution of a parameter contains all sort of usefull information to diagnose
@@ -24,7 +25,7 @@ def plot_feat_post(df_post: pd.DataFrame, feat: str, alpha: float=0.05, rope: li
         rope: the Region of Practival Equivalence. If you don't want to plot a ROPE, just ignore this input
         pass an empty tuple.
     Returns:
-        Plot the Histogram of the Posteriori Distribution
+        Histogram of the Posteriori Distribution
     """
 
     # Posteriori Distribution of the parameter
@@ -74,4 +75,55 @@ def plot_feat_post(df_post: pd.DataFrame, feat: str, alpha: float=0.05, rope: li
 
         )
     )
-    fig.show()
+
+    return fig
+
+
+def hitrogram_grid_plot(df_post: pd.DataFrame) -> go.Figure:
+    """
+    Plots the complete posteriori for all of the features in the dataframe
+    The poteriori distribution of a parameter contains all sort of usefull information to diagnose
+    and make statistical inference such as hypothesis testing. 
+    Args:
+        df_post: A posteriori joint distribution of the model parameters
+    Returns:
+       Figure with Histograms of each feature in the dataframe as subplots
+    """
+
+    # Dimensions of the subplot grid
+    nhists = len(df_post.columns)
+    cols = 4
+    rows = math.ceil(nhists/cols)
+
+    # Suplot grid initialization
+    fig = make_subplots(rows, cols, vertical_spacing=0.15)
+
+    # These counters will be usefull to locate each histogram in the grid
+    row = 1
+    col = 1
+
+    # This loop will append a histogram for each feature
+    for i in range(nhists):
+      hist_data = df_post.iloc[:, i]
+      hist = go.Histogram(x=hist_data, name=hist_data.name, marker_color='gray')
+      fig.add_trace(hist, row, col)
+      
+      # yaxis0 doesn't exist, just yaxis in that case
+      fig.layout['yaxis'+str(i if i != 0 else '')].update(showticklabels=False) # Erase the yaxis ticks
+      fig.layout['xaxis'+str(i if i != 0 else '')].update(title=hist_data.name) # Put a name on the x axis
+
+      # Just to keep filling the the grid on the next row once the current row has been filled
+      if col < 4:
+        col += 1
+      else:
+        row += 1
+        col = 1
+
+    fig.layout.update(
+        title=dict(text='Distribución a Posteriori de los Parametros', font_size=25),
+        template='plotly_white', bargap=0.1, showlegend=False,
+        # I still don't know why but I needed to erase one more more yaxis
+        yaxis15=dict(showticklabels=False)
+    )
+
+    return fig
