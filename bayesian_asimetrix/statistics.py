@@ -48,9 +48,8 @@ def max_post_estimate(df_post: pd.DataFrame) -> pd.Series:
         MAP
     """
 
-    dp_post = df_post.reset_index(drop=True)
-    pdfs = prob_density_estimate(dp_post)
-    map_theta = dp_post.loc[np.where(pdfs == pdfs.max())]
+    pdfs = prob_density_estimate(df_post)
+    map_theta = df_post.iloc[np.where(pdfs == pdfs.max())]
     map_theta.name = 'MAP'
 
     return map_theta
