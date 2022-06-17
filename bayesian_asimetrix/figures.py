@@ -10,8 +10,9 @@ import math
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from bayesian_asimetrix import statistics
+from typing import Tuple
 
-def plot_feat_post(df_post: pd.DataFrame, feat: str, alpha: float=0.05, rope: list=()) -> go.Figure:
+def plot_feat_post(df_post: pd.DataFrame, feat: str, alpha: float=0.05, rope: Tuple[float, float]=()) -> go.Figure:
     """
     Plots the posteriori of a single feature
     The poteriori distribution of a parameter contains all sort of usefull information to diagnose
@@ -38,7 +39,7 @@ def plot_feat_post(df_post: pd.DataFrame, feat: str, alpha: float=0.05, rope: li
     hdi = statistics.high_density_interval(post_dist, alpha)
 
     # In case there is a ROPE
-    if len(rope) != 0:
+    if len(rope) == 2:
       rope_text = [dict(
         showarrow=False, text='ROPE', font_color='gray',
         xref='paper', x=0, yref='paper', y=1.17
