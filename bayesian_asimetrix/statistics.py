@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 import pymc3 as pm
-import arviz as az
 
 def mode_estimate(arr: np.ndarray) -> float:
     """
@@ -49,8 +48,11 @@ def max_post_estimate(df_post: pd.DataFrame) -> pd.Series:
         MAP
     """
 
-    pdfs = prob_density_estimate(df_post)
-    map_theta = df_post.iloc[np.where(pdfs == pdfs.max())]
+    dp_post = df_post.copy()
+    params = dp_post.columns
+    kde = stats.gaussian_kde(dp_post.values.T)
+    dp_post['pdf'] = kde.pdf(dp_post.values.T)
+    map_theta = dp_post[dp_post.pdf == dp_post.pdf.max()].iloc[0][params]
     map_theta.name = 'MAP'
 
     return map_theta
@@ -68,48 +70,3 @@ def prob_density_estimate(df_post: pd.DataFrame) -> np.ndarray:
     dens = kde.pdf(df_post.values.T)
 
     return dens
-
-def summary_table(df_post: pd.DataFrame, alpha: float=0.05, round_to: int=2) -> pd.DataFrame:
-    """
-    Summarizes the information of the posteriori distribution of the model parameters.
-    For more information about the ESS and Rhat diagnostics, please refet to:
-    https://mc-stan.org/rstan/reference/Rhat.html
-    Args:
-        df_post (pd.DataFrame):  A posteriori joint distribution of the model parameters
-        alpha (float=0.05):  Significance for the High Density Interval. A number between 0 and 1.
-        round_to (int=2): Number of decimals used to round results. Defaults to 2. Use None to return the raw numbers
-    Returns:
-        pd.DataFrame: Summary Table
-        - Mode
-        - High Density Interval
-        - Bulk Effective Sample Size
-        - Tail Effective Sample Size
-        - Rhat
-
-    """
-
-    # Summmary Table Initialization
-    df_summary = pd.DataFrame(index=df_post.columns)
-
-    # Modes
-    df_summary['Mode'] = df_post.apply(mode_estimate, raw=True)
-
-    # High Density Intervals
-    df_hdi = df_post.apply(lambda x: high_density_interval(x.values, alpha))
-    df_hdi.index = [f'HDI_{alpha/2*100}%', f'HDI_{100*(1 - alpha/2)}%']
-    df_hdi = df_hdi.transpose()
-    df_summary = pd.concat([df_summary, df_hdi], axis=1)
-
-    # Effective Sample Size
-    df_summary['Bulk ESS'] = df_post.apply(az.ess, raw=True, **{'method': 'bulk'})
-    df_summary['Tail ESS'] = df_post.apply(az.ess, raw=True, **{'method': 'tail'})
-
-    # Rhat
-    df_summary['Rhat'] = az.rhat(df_post.values)
-
-    # Rounding
-    if round_to:
-        df_summary = df_summary.applymap(lambda x: round(x, round_to))
-
-    df_summary
-    return df_summary
