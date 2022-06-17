@@ -51,7 +51,7 @@ def max_post_estimate(df_post: pd.DataFrame) -> pd.Series:
 
     pdfs = prob_density_estimate(df_post)
     map_theta = df_post.iloc[np.where(pdfs == pdfs.max())]
-    map_theta.name = 'MAP'
+    map_theta['name'] = 'MAP'
 
     return map_theta
 
